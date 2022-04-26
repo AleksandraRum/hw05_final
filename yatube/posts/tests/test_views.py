@@ -300,8 +300,7 @@ class FollowPagesTests(TestCase):
             reverse('posts:profile_follow', kwargs={'username': self.author}))
         self.assertTrue(Follow.objects.filter(
             user=self.authorized_client,
-            author=self.author,
-                ).exists())
+            author=self.author).exists())
 
     def authorized_can_unfollow(self):
         """Авторизованный пользователь может отписаться от автора"""
