@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load cache %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+  <main>   
+    <div class="container py-5"> 
+      <h1>{{ title }}</h1>
+        {% include 'includes/switcher.html' %}
+        {% cache 20 follow_page %}
+        {% for post in page_obj %}
+          <article>
+            <ul>
+              <li>
+                Автор: {{ post.author.get_full_name }}
+                 <a href="{% url 'posts:profile' post.author %}">все посты пользователя</a>
+              </li>
+              <li>
+                Дата публикации: {{ post.pub_date|date:"d E Y" }}
+              </li>
+            </ul>
+            {% thumbnail post.image "200x200" crop="center" upscale=True as im %}
+            <img class="my-2" src="{{ im.url }}">
+            {% endthumbnail %}
+            <p>{{ post.text }}</p>   
+            {% if post.group %} 
+              <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы {{ post.group }}</a>
+            {% endif %} 
+            <ul>
+              <a href="{% url 'posts:post_detail' post.pk %}">подробная информация </a>
+            <ul>
+          {% if not forloop.last %}<hr>{% endif %}
+          </article>   
+        {% endfor %}
+        {% endcache %}
+      {% include 'posts/includes/paginator.html' %}
+    </div>   
+  </main>  
+{% endblock %}  
