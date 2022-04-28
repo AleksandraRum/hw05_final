@@ -58,7 +58,7 @@ class PostsViewTests(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_pages_uses_correct_template(self):
-        """URL-адрес использует соответствующий шаблон."""
+        """View-классы использует соответствующие шаблон."""
         templates_pages_names = {
             reverse('posts:index'): 'posts/index.html',
             reverse('posts:group_list', kwargs={'slug': self.group.slug}):
@@ -70,10 +70,14 @@ class PostsViewTests(TestCase):
             reverse('posts:post_edit', kwargs={'post_id': self.post.pk}):
                 'posts/create_post.html',
             reverse('posts:post_create'): 'posts/create_post.html',
+            reverse('posts:add_comment', kwargs={'post_id': self.post.pk}):
+                'posts/post_detail.html',
         }
         for reverse_name, template in templates_pages_names.items():
             with self.subTest(reverse_name=reverse_name):
-                response = self.authorized_client.get(reverse_name)
+                response = self.authorized_client.get(
+                    reverse_name, follow=True
+                )
                 self.assertTemplateUsed(response, template)
 
     def test_correct_context_index(self):
@@ -233,7 +237,7 @@ class CashViewTests(TestCase):
         super().setUpClass()
 
         cls.user = User.objects.create_user(username='author')
-        cls.post_cash = Post.objects.create(
+        cls.post = Post.objects.create(
             author=cls.user,
             text='Тестовый пост',
         )
@@ -246,11 +250,7 @@ class CashViewTests(TestCase):
     def test_cash_page(self):
         """Проверяем кэш на главной странице."""
         response = self.authorized_client.get(reverse('posts:index')).content
-        post = Post.objects.create(
-            text='Тестовый пост',
-            author=self.user,
-        )
-        post.delete()
+        self.post.delete()
         self.assertEqual(
             response, self.authorized_client.get(
                 reverse('posts:index')).content
@@ -261,7 +261,6 @@ class CashViewTests(TestCase):
                 reverse('posts:index')).content
         )
 
-# class ViewTestClass(TestCase):
     def test_error_page(self):
         response = self.client.get('/nonexist-page/')
         # Проверьте, что статус ответа сервера - 404
@@ -278,9 +277,10 @@ class FollowPagesTests(TestCase):
         cls.user = User.objects.create_user(username='noname')
         cls.follower = User.objects.create_user(username='follower')
         cls.author = User.objects.create_user(username='following')
-        cls.follow = Follow.objects.create(
-            user=cls.user,
-            author=cls.author,
+        cls.group = Group.objects.create(
+            title='Тестовый заголовок',
+            description='Тестовое описание',
+            slug='test-slug',
         )
         cls.post = Post.objects.create(
             text='Тестовый текст',
@@ -301,6 +301,10 @@ class FollowPagesTests(TestCase):
         self.assertTrue(Follow.objects.filter(
             user=self.authorized_client,
             author=self.author).exists())
+        Follower_before = self.user.follower.filter(author=self.author).count()
+        Follow.objects.create(user=self.user, author=self.author)
+        Follower_after = self.user.follower.filter(author=self.author).count()
+        self.assertEqual(Follower_before, Follower_after + 1)
 
     def authorized_can_unfollow(self):
         """Авторизованный пользователь может отписаться от автора"""
@@ -320,3 +324,19 @@ class FollowPagesTests(TestCase):
         self.assertIn(
             post.text, response.context
         )
+
+    def test_pages_uses_correct_template(self):
+        """View-классы использует соответствующие шаблон."""
+        templates_pages_names = {
+            reverse('posts:follow_index'): 'posts/follow.html',
+            reverse('posts:profile_follow', kwargs={'username': self.author}):
+                'posts/profile.html',
+            reverse('posts:profile_unfollow', kwargs={'username': self.user}):
+                'posts/profile.html',
+        }
+        for reverse_name, template in templates_pages_names.items():
+            with self.subTest(reverse_name=reverse_name):
+                response = self.authorized_client.get(
+                    reverse_name, follow=True
+                )
+                self.assertTemplateUsed(response, template)

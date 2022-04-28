@@ -1,13 +1,11 @@
 import shutil
 import tempfile
 
-# from http import HTTPStatus
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-# from posts.forms import PostForm
 from ..models import Group, Post, User, Comment
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -67,7 +65,6 @@ class PostsCreateTests(TestCase):
             data=form_data,
             follow=True
         )
-        # self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertRedirects(response, reverse(
             'posts:profile', kwargs={'username': self.user.username}))
         self.assertEqual(Post.objects.count(), posts_count + 1)
@@ -111,7 +108,7 @@ class PostsCreateTests(TestCase):
         self.assertEqual(Post.objects.count(), posts_count)
         self.assertEqual(response.status_code, 200)
 
-    def test_auth_cannot_create_comment(self):
+    def test_auth_can_create_comment(self):
         """Авторизованный пользователь может создавать коммент"""
         comment_count = Comment.objects.count()
         form_data = {
@@ -125,6 +122,8 @@ class PostsCreateTests(TestCase):
         self.assertEqual(Comment.objects.count(), comment_count + 1)
         last_comment = Comment.objects.last()
         self.assertEqual(last_comment.text, form_data['text'])
+        self.assertEqual(last_comment.author, self.user)
+        self.assertEqual(last_comment.post, self.post)
         self.assertEqual(response.status_code, 200)
 
     def test_non_auth_cannot_create_comment(self):
@@ -140,3 +139,4 @@ class PostsCreateTests(TestCase):
         )
         self.assertEqual(Comment.objects.count(), comment_count)
         self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, ('/auth/login/?next=/posts/1/comment/'))

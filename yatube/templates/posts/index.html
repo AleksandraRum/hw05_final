@@ -2,8 +2,7 @@
 {% load thumbnail %}
 {% load cache %}
 {% block title %}{{ title }}{% endblock %}
-{% block content %}
-  <main>   
+{% block content %}  
     <div class="container py-5"> 
       <h1>{{ title }}</h1>
         {% include 'includes/switcher.html' %}
@@ -33,7 +32,6 @@
           </article>   
         {% endfor %}
         {% endcache %}
-      {% include 'posts/includes/paginator.html' %}
-    </div>   
-  </main>  
+      {% include 'includes/paginator.html' %}
+    </div>     
 {% endblock %}  

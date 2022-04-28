@@ -19,13 +19,10 @@
   </head>
   <body>
     {% include 'includes/header.html' %} 
-    <main>   
-      <div class="container py-5">  
+    <main>    
         {% block content %} 
         Подставить свое
-        {% endblock %}  
-        {% include 'includes/paginator.html' %}
-      </div>   
+        {% endblock %}    
     </main>
     {% include "includes/footer.html" %}
   </body>

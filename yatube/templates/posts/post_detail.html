@@ -2,7 +2,7 @@
 {% load thumbnail %}
 {% load user_filters %}
 {% block title %} Пост: {{ title|truncatechars:30 }}{% endblock %}
-  <main>
+  <div class="container py-5"> 
     <div class="row">
       {% block content %}
         <aside class="col-12 col-md-3">
@@ -71,5 +71,5 @@
         </article>
       {% endblock %}
     </div> 
-  </main>
+  </div>
     
