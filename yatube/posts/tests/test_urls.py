@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 
-from ..models import Group, Post, User, Follow
+from ..models import Group, Post, User
 
 
 class PostsURLTests(TestCase):
