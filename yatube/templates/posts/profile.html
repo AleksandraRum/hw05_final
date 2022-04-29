@@ -2,7 +2,6 @@
 {% load thumbnail %}
 {% block title %} Профайл пользователя {{author.username} {% endblock %}
 {% block content %}  
-<div class="container py-5"> 
     <div class="mb-5"> 
       <h1>Все посты пользователя {{author.username}} </h1>
       <h3>Всего постов: {{num_of_posts}} </h3>  
@@ -42,8 +41,7 @@
           {% if not forloop.last %}<hr>{% endif %}
         {% endfor %}
         {% include 'includes/paginator.html' %}
-    </div> 
-  </div>  
+    </div>  
 {% endblock %}
 
 

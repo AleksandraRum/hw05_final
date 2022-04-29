@@ -66,31 +66,3 @@ class PostsURLTests(TestCase):
         response = self.guest_client.get('/unexisting_page/')
         self.assertEqual(response.status_code, 404)
         self.assertTemplateUsed(response, 'core/404.html')
-
-
-class FollowURLTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.user = User.objects.create_user(username='noname')
-        cls.follower = User.objects.create_user(username='follower')
-        cls.author = User.objects.create_user(username='following')
-        cls.follow = Follow.objects.create(
-            user=cls.user,
-            author=cls.author,
-        )
-        cls.group = Group.objects.create(
-            title='Тестовый заголовок',
-            description='Тестовый тест',
-            slug='test-slug',
-        )
-        cls.post = Post.objects.create(
-            text='Тестовый текст',
-            author=cls.user,
-            # group=cls.group,
-        )
-
-    def setUp(self):
-        self.guest_client = Client()
-        self.authorized_client = Client()
-        self.authorized_client.force_login(self.user)

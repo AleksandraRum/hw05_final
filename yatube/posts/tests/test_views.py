@@ -261,13 +261,6 @@ class CashViewTests(TestCase):
                 reverse('posts:index')).content
         )
 
-    def test_error_page(self):
-        response = self.client.get('/nonexist-page/')
-        # Проверьте, что статус ответа сервера - 404
-        # Проверьте, что используется шаблон core/404.html
-        self.assertEqual(response.status_code, 404)
-        self.assertTemplateUsed(response, 'core/404.html')
-
 
 class FollowPagesTests(TestCase):
 
@@ -277,6 +270,7 @@ class FollowPagesTests(TestCase):
         cls.user = User.objects.create_user(username='noname')
         cls.follower = User.objects.create_user(username='follower')
         cls.author = User.objects.create_user(username='following')
+        cls.follow = Follow.objects.create(user=cls.user, author=cls.author)
         cls.group = Group.objects.create(
             title='Тестовый заголовок',
             description='Тестовое описание',
@@ -296,21 +290,24 @@ class FollowPagesTests(TestCase):
     def authorized_can_follow(self):
         """Авторизованный пользователь может подписываться на других
     пользователей."""
+        Follower_before = self.user.follower.filter(author=self.author).count()
         self.authorized_client.get(
             reverse('posts:profile_follow', kwargs={'username': self.author}))
         self.assertTrue(Follow.objects.filter(
             user=self.authorized_client,
             author=self.author).exists())
-        Follower_before = self.user.follower.filter(author=self.author).count()
-        Follow.objects.create(user=self.user, author=self.author)
         Follower_after = self.user.follower.filter(author=self.author).count()
         self.assertEqual(Follower_before, Follower_after + 1)
 
     def authorized_can_unfollow(self):
         """Авторизованный пользователь может отписаться от автора"""
-        object = Follow.objects.create(user=self.user, author=self.author)
         Follower_before = self.user.follower.filter(author=self.author).count()
-        object.delete()
+        self.authorized_client.get(
+            reverse('posts:profile_unfollow', kwargs={'username': self.author})
+        )
+        self.assertFalse(Follow.objects.filter(
+            user=self.authorized_client,
+            author=self.author).exists())
         Follower_after = self.user.follower.filter(author=self.author).count()
         self.assertEqual(Follower_before, Follower_after - 1)
 
