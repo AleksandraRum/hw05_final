@@ -12,7 +12,7 @@
 
  - Python 3.7.0
  - Django 3.2.13
- -  HTML
+ - HTML
 
 ## Установка и запуск проекта:
 
@@ -22,12 +22,19 @@
 git clone https://github.com/AleksandraRum/hw05_final.git
 ```
 
-2. Установить виртуальное окружение, активировать и установить в него необходимые зависимости:
+2. Перейти в папку с проектом и установить виртуальное окружение, активировать его:
 
 ```
+cd hw05_final
+
 python3 -m venv venv
 
-. venv/bin/activate
+source venv/bin/activate
+```
+
+3. Установить в него необходимые зависимости:
+
+```
 
 python3 -m pip install --upgrade pip
 
@@ -35,7 +42,7 @@ pip install -r requirements.txt
 
 ```
 
-3. Перейти в директорию с файлом manage.py и выполнить миграции:
+4. Перейти в директорию с файлом manage.py и выполнить миграции:
 
 ```
 cd yatube
@@ -43,7 +50,7 @@ cd yatube
 python manage.py migrate
 ```
 
-4. Запустить проект в режиме Django:
+5. Запустить проект в режиме Django:
 
 ```
 python manage.py runserver
